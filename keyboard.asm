@@ -1,108 +1,105 @@
-
-command_print_char: ;....................................... PARAMETERS: si = char number
+; «·„ ÿ·»« : si = —ﬁ„ «·Õ—› ›Ì ﬁ«∆„… «·Õ—Ê› «·⁄—»Ì…
+command_print_char:
 	
-	push 	si ;............................................ save char number
+	push 	si ;............................................ Õ›Ÿ —ﬁ„ «·Õ—›
 	
-	call 	get_char_offset ;............................... get char offset in font segment
+	call 	get_char_offset ;............................... si = „Êﬁ⁄ «·Õ—› ⁄·Ï «·–«ﬂ—…
 	
 	xor 	ax, ax
-	mov 	al, byte[fs:si] ;............................... al = char attributes
+	mov 	al, byte[fs:si] ;............................... al = Œ’«∆’ «·Õ—›
 	
-	and 	al, 00010000b ;................................. is char right connectable?
-	jnz 	.previous_char_left_connectable_test ;.......... YES? go to check if previous char is left connectable or not
-	jmp 	.draw_char ;.................................... else draw char end finish
+	and 	al, 00010000b ;................................. Â· Â–« «·Õ—› ﬁ«»· ··—»ÿ „‰ «·Ì„Ì‰ø
+	jnz 	.previous_char_left_connectable_test ;.......... ‰⁄„ø ‰‰ ﬁ· ·›Õ’ «·Õ—› «·”«»ﬁ ≈–« „« ﬂ«‰ ﬁ«»·« ··—»ÿ „‰ «·Ì”«— √„ ·«
+	jmp 	.draw_char ;.................................... ·«ø ‰‰ ﬁ· „»«‘—… ≈·Ï —”„ «·Õ—› «· «·Ì
 	
 	.previous_char_left_connectable_test:
 		
 		xor 	ax, ax
-		mov 	si, command_buffer ;........................ si = command buffer location
-		mov 	al, byte [buffer_index] ;................... al = buffer index
-		cmp 	al, 0 ;..................................... buffer index = 0?
-		jle 	.draw_char ;................................ YES? just draw current char
-				;........................................... else
-		dec 	al ;........................................ get the previous char index
-		add 	si, ax ;.................................... si = previous command buffer char offset
+		mov 	si, command_buffer ;........................ si = „Êﬁ⁄ ”·”·… «·Õ—Ê› «·„ﬂÊ‰… ·«”„ «·√„—
+		mov 	al, byte [buffer_index] ;................... al = „ƒ‘— „Êﬁ⁄‰« «·Õ«·Ì ›Ì ”·”·… «·Õ—Ê› «·„ﬂÊ‰… ·«”„ «·√„—
+		cmp 	al, 0 ;..................................... ‰Õ‰ ›Ì »œ«Ì… «·”·”·…ø
+		jle 	.draw_char ;................................ ‰⁄„ø «‰ ﬁ· „»«‘—… ·—”„ «·Õ—›
+		dec 	al ;........................................ ·«ø «Œ Ì«— „ƒ‘— «·Õ—› «·”«»ﬁ
+		add 	si, ax ;.................................... si = „Êﬁ⁄ «·Õ—› «·”«»ﬁ „‰ ”·”·… «·Õ—Ê› «·„ﬂÊ‰… ·«”„ «·√„— ›Ì «·–«ﬂ—…
 		
-		mov 	si, [si] ;.................................. si = previous command buffer char number
-		push 	si ;........................................ save previous command buffer char number
+		mov 	si, [si] ;.................................. si = —ﬁ„ «·Õ—›
+		push 	si
 		
-		call 	get_char_offset ;........................... get previous command buffer char offset (in font segment)
+		call 	get_char_offset ;........................... „Êﬁ⁄ »Ì«‰«  «·Õ—› ›Ì «·–«ﬂ—… («·Œÿ)
 		
 		
 		xor 	ax, ax
-		mov 	al, byte[fs:si] ;........................... al = first byte of the font's char data => al = char attributes
-		mov 	cx, ax ;.................................... cx = previous command char attributes
+		mov 	al, byte[fs:si] ;........................... «·À„«‰Ì «·√Ê· „‰ »Ì«‰«  «·Õ—› ÌÕ ÊÌ ⁄·Ï Œ’«∆’ «·Õ—›
+		mov 	cx, ax
 		
-		pop 	si ;........................................ si = our main char (the char we are trying to write)
+		pop 	si ;........................................ ‰⁄Êœ ≈·Ï «·Õ—› «·√Ê· («·Õ—› «·–Ì ‰—Ìœ ﬂ «» Â ›Ì «·√’·)
 		
 		
-		test 	al, 00100000b ;............................. is previous command char left connectable?
-		jz 		.draw_char ;................................ NO? draw main char without connections
-				;........................................... else
-		test 	al, 10000000b ;............................. is previous command char already right connected?
-		jnz 	.get_right_connected_instance ;............. YES? skip previous command char replacement, and go get the right connected instance of our main char
+		test 	al, 00100000b ;............................. Â· «·Õ—› «·”«»ﬁ ﬁ«»· ··« ’«· „‰ «·Ì”«—ø
+		jz 		.draw_char ;................................ ·«ø «‰ ﬁ· ≈·Ï —”„ «·Õ—› «·√’·Ï „»«‘—… »œÊ‰ „Õ«Ê·… Ê’·Â »«·Õ—› «·”«»ﬁ
+		test 	al, 10000000b ;............................. Â· «·Õ—› «·”«»ﬁ „ ’· „‰ «·Ì”«—ø (ÿ»⁄« Â–Â «·Õ«·… „” »⁄œ… Ê·ﬂ‰ ·Ì”  „” ÕÌ·…)
+		jnz 	.get_right_connected_instance ;............. ‰⁄„ø ≈–‰ ·« ‰Õ«Ê· «” »œ«· «·Õ—› «·”«»ﬁ »· ‰‰ ﬁ· „»«‘—… ≈·Ï —”„ «·Õ—› «·–Ì ‰—Ìœ ﬂ «» Â (»⁄œ «·Õ’Ê· ⁄·Ï «·‰”Œ… «·„ ’·… „‰ «·Ì„Ì‰ ÿ»⁄«)
 		
 	.replace_previous_char:
 	
-		push 	si ;........................................ save our main char number
-		push 	cx ;........................................ save previous command char attributes
+		push 	si ;........................................ —ﬁ„ «·Õ—› «·√’·Ï
+		push 	cx ;........................................ Œ’«∆’ «·Õ—› «·”«»ﬁ
 		
-		call 	command_erase_char ;........................ erase previous command char
+		call 	command_erase_char ;........................ „”Õ «·Õ—› «·”«»ﬁ
 		
-		pop 	cx ;........................................ get our main char number
-		pop 	si ;........................................ get previous command char attributes
+		pop 	cx
+		pop 	si
 		
-		add 	si, 2 ;..................................... the left connected instance of the char is two steps after current char (either it is an isolated char or a right connected one, please look at font chars map)
+		add 	si, 2 ;..................................... «·‰”Œ… «·„ ’·… „‰ «·Ì”«— ·√Ì Õ—›  ÊÃœ ﬁ»·Â »ŒÿÊ Ì‰(«‰Ÿ— ≈·Ï ÃœÊ· «·Õ—Ê› Ê«·—„Ê“ «·Œ«’… »«·Œÿ)
 		
 		xor 	ax, ax
-		mov 	di, command_buffer ;........................ di = command buffer location
+		mov 	di, command_buffer ;........................ „Êﬁ⁄ ”·”·… Õ—Ê› «”„ «·√„— ⁄·Ï «·–«ﬂ—…
 		mov 	al, byte [buffer_index]
-		add 	di, ax ;.................................... di = di + buffer index
-		mov 	[di], si ;.................................. replace previous commmand buffer char number by the connected char number
+		add 	di, ax ;.................................... di = „Êﬁ⁄ «·Õ—› «·”«»ﬁ „‰ ”·”·… Õ—Ê› «”„ «·√„—
+		mov 	[di], si ;.................................. ‰” »œ· «·Õ—› «·”«»ﬁ (√Ê »«·√Õ—Ï —ﬁ„ «·Õ—› «·”«»ﬁ) ›Ì ”·”·… Õ—Ê› «”„ «·√„— »—ﬁ„ ‰”Œ… «·Õ—› «·„ ’·… „‰ «·Ì”«—
 		
 		
-		call 	draw_char ;................................. draw the command buffer left connected char
+		call 	draw_char ;................................. —”„ «·Õ—› «·”«»ﬁ
 		
 		xor 	ax, ax
-		mov 	al, byte[LAST_CHAR_WIDTH] ;................. draw char function saves this variable (please look at draw_char (file: string.asm))
-		add 	word [CHAR_X], ax ;......................... set current horizontal writing position just after the new command buffer left connected char (the replacement char)
+		mov 	al, byte[LAST_CHAR_WIDTH] ;................. Â–« «·—ﬁ„ Ì „ Õ›ŸÂ ⁄‰œ —”„ ﬂ· Õ—› («‰Ÿ— œ«·… —”„ «·Õ—›)
+		add 	word [CHAR_X], ax ;......................... «·„Êﬁ⁄ «·√›ﬁÌ ·—”„ «·Õ—› Ì√ Ì  „«„« »⁄œ «·Õ—› «·”«»ﬁ(«·‰”Œ… «·„ ’·… „‰ «·Õ—› ÿ»⁄«)
 		
 		
-		inc 	byte [buffer_index] ;....................... reset the buffer index
+		inc 	byte [buffer_index] ;.......................  ’ÕÌÕ „Ê÷⁄ „ƒ‘— «·„Êﬁ⁄ ⁄·Ï ”·”·… «·Õ—Ê› «·Œ«’… »«”„ «·√„—
 		
 	.get_right_connected_instance:
 		
-		pop 	si ;........................................ get our main char number
+		pop 	si ;........................................ —ﬁ„ «·Õ—› «·√Ê· («·Õ—› «·–Ì ‰—Ìœ ﬂ «» Â ›Ì «·√’·)
 		
-		cmp 	si, 137 	  ;............................. is tamdeed?
-		je 		.skip_research ;............................ YES? don't look for char replacement
-				;........................................... else
-		inc 	si ;........................................ get the right connected instance, the right connected instance is one step after current char (either its an isolated char or a left connected one, please look at font chars map)
-		push 	si ;........................................ save the right connected instance char number
-		jmp 	.draw_char ;................................ go to draw the right connected instance
+		cmp 	si, 137 	  ;............................. Â· Â–« «·Õ—› ⁄»«—… ⁄‰  „œÌœø
+		je 		.skip_research ;............................ ‰⁄„ø ≈–‰ ·«  Õ«Ê· «” »œ«· «·Õ—› («· „œÌœ ·Ì” ·œÌÂ √Ì ‰”Œ° ›ﬁÿ Õ—› Ê«Õœ)
+		inc 	si ;........................................ ·«ø ≈–‰ ‰»ÕÀ ⁄‰ «·‰”Œ… «·„ ’·… „‰ «·Ì„Ì‰ ·Â–« «·Õ—›(«·‰”Œ… «·„ ’·… „‰ «·Ì„Ì‰ ·√Ì Õ—›  ÊÃœ »⁄œÂ »ŒÿÊ… Ê«Õœ…)
+		push 	si ;........................................ —ﬁ„ «·Õ—› («·‰”Œ… «·„ ’·… „‰ «·Ì„Ì‰)
+		jmp 	.draw_char
 		
 		.skip_research:
 		
-		push 	si ;........................................ save the right connected instance char number
+			push 	si
 	
 	.draw_char:
 	
-		pop 	si ;........................................ get our main char number or the right connected instance number (depends on where we came from)
-		push 	si ;........................................ save main char / right connected instance number
+		pop 	si ;........................................ —ﬁ„ «·Õ—› «·–Ì ‰—Ìœ —”„Â («·Õ—› «·√’·Ì √Ê «·‰”Œ… «·„ ’·… „‰ «·Õ—›)
+		push 	si
 		call 	draw_char
 		
 		xor 	ax, ax
 		mov 	al, byte[LAST_CHAR_WIDTH]
-		add 	word [CHAR_X], ax ;......................... set current horizontal writing position just after our main char / right conneced instance
+		add 	word [CHAR_X], ax ;......................... «·„Êﬁ⁄ «·√›ﬁÌ «·ÃœÌœ ··—”„ Ì√ Ì »⁄œ «·Õ—› «·–Ì —”„‰«Â «·¬‰
 		
 	
 	xor 	ax, ax 
-	mov 	di, command_buffer ;............................ di = command buffer location
+	mov 	di, command_buffer ;............................ „Êﬁ⁄ ”·”·… Õ—Ê› «”„ «·√„— ⁄·Ï «·–«ﬂ—…
 	mov 	al, byte [buffer_index]
-	add 	di, ax ;........................................ di = di + buffer index
+	add 	di, ax ;........................................ di = „Êﬁ⁄ «·Õ—› ›Ì ”·”·… Õ—Ê› «”„ «·√„—
 	
-	pop 	si ;............................................ get our main char number or the right connected instance number
-	mov 	[di], si ;...................................... add main char / right connected instance to command buffer
+	pop 	si ;............................................ —ﬁ„ «·Õ—› «·–Ì —”„‰«Â («·Õ—› «·√’·Ì √Ê «·‰”Œ… «·„ ’·…)
+	mov 	[di], si ;...................................... ≈÷›… —ﬁ„ «·Õ—› / «·‰”Œ… «·„ ’·… ≈·Ï ”·”·… «·Õ—Ê› «·Œ«’… »«”„ «·√„—
 	
 	inc 	byte [buffer_index]
 	
@@ -110,30 +107,30 @@ command_print_char: ;....................................... PARAMETERS: si = ch
 	
 ;###########################################################
 
-command_update_last_char: ;update last char after erase command
+; ≈⁄«œ… —”„ «·Õ—› «·√ŒÌ— »⁄œ „”Õ Õ—› Ê«Õœ
+command_update_last_char:
 	
 	xor 	ax, ax
-	mov 	si, command_buffer ;............................ si = command_buffer
-	mov 	al, byte [buffer_index] ;....................... al = buffer index
-	cmp 	al, 0 ;......................................... is buffer index = 0? (buffer index = 0 => we have no chars in command input)
-	jle 	.return ;....................................... YES? return
-			;............................................... else
-	dec 	al ;............................................ decrease buffer index (we are trying to redraw last char in command buffer)
+	mov 	si, command_buffer ;............................ „Êﬁ⁄ ”·”·… Õ—Ê› «”„ «·√„— ⁄·Ï «·–«ﬂ—…
+	mov 	al, byte [buffer_index] ;....................... al = „ƒ‘— „Êﬁ⁄‰« «·Õ«·Ì ›Ì ”·”·… «·Õ—Ê› «·„ﬂÊ‰… ·«”„ «·√„—
+	cmp 	al, 0 ;......................................... ‰Õ‰ ›Ì »œ«Ì… «·”·”·…ø
+	jle 	.return ;....................................... ‰⁄„ø ≈–‰ ‰–Â» „»«‘—… ≈·Ï ‰Â«Ì… «·œ«·… (·« ‰ﬁÊ„ »√Ì ⁄„·)
+	dec 	al ;............................................ ‰—Ã⁄ ﬁÌ„… „ƒ‘— «·„Êﬁ⁄ ⁄·Ï ”·”·… Õ—Ê› «”„ «·√„— »œ—Ã… Ê«Õœ… (‰Õ‰ ‰—Ìœ ≈⁄«œ… —”„ «·Õ—› «·√ŒÌ— )
 	add 	si, ax
 	
-	mov 	si, [si] ;...................................... si = char number
+	mov 	si, [si] ;...................................... si = —ﬁ„ «·Õ—› «·√ŒÌ— ›Ì ”·”·… Õ—Ê› «”„ «·√„—
 	push 	si 
 	
-	call 	get_char_offset ;............................... si = char offset in font segment
+	call 	get_char_offset ;............................... si = „Êﬁ⁄ »Ì«‰«  «·Õ—› ⁄·Ï «·–«ﬂ—… (÷„‰ »Ì«‰«  «·Œÿ «·„Õ„·… ⁄·Ï «·–«ﬂ—…)
 	
 	xor 	ax, ax
-	mov 	al, byte[fs:si] ;............................... al = char attributes
-	mov 	cx, ax ;........................................ cx = char attributes
+	mov 	al, byte[fs:si] ;............................... al = Œ’«∆’ «·Õ—›
+	mov 	cx, ax ;........................................ cx = Œ’«∆’ «·Õ—›
 	
-	pop 	si ;............................................ si = char number
+	pop 	si ;............................................ si = —ﬁ„ «·Õ—›
 	
-	test 	al, 10000000b ;................................. is char left connected?
-	jz		.return ;....................................... NO? return
+	test 	al, 10000000b ;................................. Â· Â–« «·Õ—› „ ’· „‰ «·Ì”«—ø
+	jz		.return ;....................................... ·«ø ≈–‰ ‰–Â» ≈·Ï ‰Â«Ì… «·œ«·… (·√‰‰« ·« ‰Õ «Ã ·«” »œ«· Õ—› €Ì— „ ’· √’·«)
 	
 	.replace_previous_char:
 	
@@ -145,14 +142,13 @@ command_update_last_char: ;update last char after erase command
 		pop 	cx
 		pop 	si
 		
-		cmp 	si, 137 ;................................... is tamdeed?
-		je 		.skip 	;................................... YES? don't look for char replacement
-				;........................................... else
-		sub 	si, 2 ;..................................... replacement is two steps before
+		cmp 	si, 137 ;................................... Â· Â–« «·Õ—› ⁄»«—… ⁄‰  „œÌœø
+		je 		.skip 	;................................... ‰⁄„ø ·«  Õ«Ê· «” »œ«· «·Õ—›(«· „œÌœ ·œÌÂ ‘ﬂ· Ê«Õœ ›ﬁÿ)
+		sub 	si, 2 ;..................................... ·«ø «·Õ—› «·»œÌ· ÂÊ «·Õ—› „« ﬁ»· «·”«»ﬁ ··Õ—› «·„⁄‰Ì »«·«” »œ«·
 		
 		.skip:
 		
-		push 	si ;........................................ save replacement char number
+		push 	si ;........................................ Õ›Ÿ —ﬁ„ «·Õ—› «·»œÌ·
 		
 		call 	draw_char
 		
@@ -160,16 +156,16 @@ command_update_last_char: ;update last char after erase command
 		mov 	al, byte[LAST_CHAR_WIDTH]
 		add 	word [CHAR_X], ax
 		
-		pop 	si ;........................................ si = replacement char number
+		pop 	si ;........................................ —ﬁ„ «·Õ—› «·»œÌ·
 		
 		xor 	ax, ax
 		mov 	di, command_buffer
 		mov 	al, byte [buffer_index]
 		add 	di, ax
 		
-		mov 	[di], si ;.................................. replace char number in command buffer
+		mov 	[di], si ;.................................. «” »œ«· —ﬁ„ «·Õ—› ›Ì ”·”·… «·Õ—Ê› «·Œ«’… »«”„ «·√„—
 		
-		inc 	byte [buffer_index] ;....................... reset buffer index
+		inc 	byte [buffer_index] ;.......................  ’ÕÌÕ „Ê÷⁄ „ƒ‘— «·„Êﬁ⁄ ⁄·Ï ”·”·… «·Õ—Ê› «·Œ«’… »«”„ «·√„—
 		
 	.return:
 		
@@ -264,7 +260,7 @@ read_keyboard:
 		
 		mov 	bx, ax
 	
-	cmp bh, 1			; escape
+	cmp bh, 1			; “— «·Â—Ê»
 	je 	.scan_keyboard_key
 	
 	cmp bh, 2
@@ -303,7 +299,7 @@ read_keyboard:
 	cmp bh, 13
 	je .check_shift_key
 		
-	cmp bh, 14	; backspace
+	cmp bh, 14	; “— „”Õ Õ—›
 	je .erase_char
 	
 	cmp bh, 15
@@ -345,7 +341,7 @@ read_keyboard:
 	cmp bh, 27
 	je .write_del
 	
-	cmp bh, 28
+	cmp bh, 28 ; “— «·≈œŒ«·
 	je .execute_command
 	
 	cmp bh, 29
@@ -1101,11 +1097,11 @@ read_keyboard:
 	
 	.execute_command:
 		
-		cmp 	byte[buffer_index], 0 	; no command?
-		je 		.no_command				; skip all commands
+		cmp 	byte[buffer_index], 0 	;................... «·„” Œœ„ ·„ Ìﬁ„ »≈œŒ«· √Ì ÿ·» (·„ Ìﬂ » √Ì ‘Ì¡)
+		je 		.no_command				;...................  Ã«Ê“ ›Õ’ «·√Ê«„—
 	
 		
-		;************************************** command help
+		;************************************** «·√„—: „”«⁄œ…
 		mov 	si, command_name_help
 		call 	check_command
 		
@@ -1116,7 +1112,7 @@ read_keyboard:
 		
 		.go_next_command_0:
 		
-		;******************** command help 2 (question mark)
+		;*********************** «·√„—: ø (»œÌ· ··√„—: „”«⁄œ…)
 		mov 	si, command_name_help_2
 		call 	check_command
 		
@@ -1127,7 +1123,7 @@ read_keyboard:
 		
 		.go_next_command_00:
 		
-		;*********************************** command version
+		;*************************************** «·√„—: ≈’œ«—
 		mov 	si, command_name_version
 		call 	check_command
 		
@@ -1138,7 +1134,7 @@ read_keyboard:
 		
 		.go_next_command_1:
 		
-		;****** command version 2 (using alef without hamza)
+		;*************************** «·√„—: «’œ«— (»œÊ‰ Â„“…)
 		mov 	si, command_name_version_2
 		call 	check_command
 		
@@ -1149,7 +1145,7 @@ read_keyboard:
 		
 		.go_next_command_11:
 		
-		;********************************** command poweroff
+		;**************************************** «·√„—: √ÿ›∆
 		mov 	si, command_name_poweroff
 		call 	check_command
 		
@@ -1160,7 +1156,7 @@ read_keyboard:
 		
 		.go_next_command_2:
 		
-		;***** command poweroff 2 (using alef without hamza)
+		;***************************** «·√„— «ÿ›∆ (»œÊ‰ Â„“…)
 		mov 	si, command_name_poweroff_2
 		call 	check_command
 		
@@ -1171,7 +1167,7 @@ read_keyboard:
 		
 		.go_next_command_22:
 		
-		;****************************** command clean screen
+		;***************************************** «·√„—: „”Õ
 		mov 	si, command_name_clean
 		call 	check_command
 		
@@ -1182,7 +1178,7 @@ read_keyboard:
 		
 		.go_next_command_3:
 		
-		;******** command clean screen 2 (using cleanscreen)
+		;***************** (»œÌ·: ··√„— „”Õ) «·√„—: „”Õ «·‘«‘…
 		mov 	si, command_name_cleanscreen
 		call 	check_command
 		
@@ -1193,7 +1189,7 @@ read_keyboard:
 		
 		.go_next_command_33:
 		
-		;command clean screen 2 (using cleanscreen with hee)
+		;* «·√„—: „”Õ «·‘«‘… (»«” ⁄„«· «·Õ—›: Â »œ· «·Õ—›: …)
 		mov 	si, command_name_cleanscreen_2
 		call 	check_command
 		
@@ -1205,7 +1201,7 @@ read_keyboard:
 		.go_next_command_333:
 		
 		
-		;************************************* wrong command
+		;*****************  „ ≈œŒ«· √„— Œ«ÿ∆ „‰ ﬁ»· «·„” Œœ„
 		.wrong_command:
 		
 			call 	show_error_message

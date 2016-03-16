@@ -28,7 +28,7 @@ cmd_version:
 	
 	mov 	si, str_alfanak_os
 	call 	print_string
-	add 	word [CHAR_X], 5; space
+	add 	word [CHAR_X], 5 ; ›—«€
 	mov 	si, str_version_number
 	call 	print_string
 	
@@ -101,7 +101,7 @@ cmd_clean_screen:
 	xor 	dx, dx
 	mov 	dl, byte[LINE_HEIGHT]
 	mov 	al, byte[CURRENT_LINE]
-	inc 	al ; wipe current line too
+	inc 	al ; ≈÷«›… «·”ÿ— «·Õ«·Ì
 	mul 	dl
 	xor 	dx, dx
 	mov 	dl, byte [TOP_PANEL_HEIGHT]
@@ -166,18 +166,18 @@ show_error_message:
 
 ;###########################################################
 
-command_name_help 			db 111, 64, 21, 87, 54, 121, 0
-command_name_help_2 		db 139, 0 ; question mark
-command_name_version 		db 24, 71, 54, 20, 57, 0
-command_name_version_2 		db 20, 71, 54, 20, 57, 0 ; using alef without hamza
-command_name_reboot 		db 24, 87, 21, 53, 121, 138, 20, 107, 36, 68, 92, 130, 106, 0
-command_name_poweroff 		db 22, 79, 96, 134, 0
-command_name_poweroff_2		db 20, 79, 96, 134, 0 ; using alef without hamza
-command_name_clean			db 111, 64, 46, 0
-command_name_cleanscreen	db 111, 64, 46, 138, 20, 107, 68, 21, 67, 122,0
-command_name_cleanscreen_2	db 111, 64, 46, 138, 20, 107, 68, 21, 67, 118,0; using hee insteed of taa_marbota
+command_name_help 			db 111, 64, 21, 87, 54, 121, 0 ; „”«⁄œ…
+command_name_help_2 		db 139, 0 ; ⁄·«„… «” ›Â«„
+command_name_version 		db 24, 71, 54, 20, 57, 0 ; ≈’œ«—
+command_name_version_2 		db 20, 71, 54, 20, 57, 0 ; «’œ«—
+command_name_reboot 		db 24, 87, 21, 53, 121, 138, 20, 107, 36, 68, 92, 130, 106, 0 ; ≈⁄«œ… «· ‘€Ì·
+command_name_poweroff 		db 22, 79, 96, 134, 0 ; √ÿ›∆
+command_name_poweroff_2		db 20, 79, 96, 134, 0 ; «ÿ›∆
+command_name_clean			db 111, 64, 46, 0 ; „”Õ
+command_name_cleanscreen	db 111, 64, 46, 138, 20, 107, 68, 21, 67, 122,0 ; „”Õ «·‘«‘…
+command_name_cleanscreen_2	db 111, 64, 46, 138, 20, 107, 68, 21, 67, 118,0 ; „”Õ «·‘«‘Â
 
-str_alfanak_os 				db 115, 84, 21, 109, 138, 35, 68, 92, 130, 106, 138, 20, 107, 92, 116, 102, 0
-str_version_number 			db 11, 10, 10, 152, 10, 0 ; RTL number
-str_help_message 			db 22, 119, 108, 21, 138, 123, 63, 120, 108, 21, 138, 31, 102, 138, 95, 128, 138, 0
-str_command_unknown 		db 79, 108, 30, 138, 91, 130, 58, 138, 111, 88, 58, 123, 93, 0
+str_alfanak_os 				db 115, 84, 21, 109, 138, 35, 68, 92, 130, 106, 138, 20, 107, 92, 116, 102, 0 ; ‰Ÿ«„  ‘€Ì· «·›‰ﬂ
+str_version_number 			db 11, 10, 10, 152, 10, 0 ; —ﬁ„ «·≈’œ«— („ﬂ Ê» „‰ «·Ì„Ì‰ ≈·Ï «·Ì”«—)
+str_help_message 			db 22, 119, 108, 21, 138, 123, 63, 120, 108, 21, 138, 31, 102, 138, 95, 128, 138, 0 ; √Â·« Ê”Â·« »ﬂ„ ›Ì
+str_command_unknown 		db 79, 108, 30, 138, 91, 130, 58, 138, 111, 88, 58, 123, 93, 0 ; ÿ·» €Ì— „⁄—Ê›

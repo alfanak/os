@@ -2,7 +2,7 @@ start: jmp main
 
 times 0x0B - $ + start db 0
 
-;######################## BIOS PARAMETER BLOCK #################################
+;###########################################################
 
 bytes_per_sector:		dw 512
 sectors_per_cluster:	db 1
@@ -21,71 +21,185 @@ drive_number:			db 0
 unused:					db 0
 boot_signature:			db 0x29
 serial_number:			dd 0xffffffff
-volume_label:			db "ALFANAK OS " ;.................. 11 bytes
-file_system:			db "FAT12   "	 ;.................. 8 bytes
+volume_label:			db "ALFANAK OS "
+file_system:			db "FAT12   "
 
-;###############################################################################		
+;###########################################################
 
-; NOTE: dl already contains current drive numver (BIOS set this value to execute int 0x19)
+OS_SEGMENT dw 0x0050
 
-load_font:
+FILE_SEGMENT dw 0;
 
-	mov 	bx, 0x0200 ;.................................... load font to 0x0C70:0x0200 --> just after our bootloader
-	mov 	ah, 2
-	mov 	al, 4	   ;.................................... font is exactly 4 sectors size (2048 bytes)
-	mov 	ch, 0
-	mov 	cl, 2
-	mov 	dh, 0
-	int 	0x13
-	ret
-		
-;###############################################################################
+boot_drive db 0
 
-load_logo:
+;FILE_NAME db 20, 107, 112, 58, 103, 60, 0; «·„—ﬂ“
+
+
+file_name 		db "OS_MAIN BIN"
+file_cluster	dw 0
+FAT_size 		db 0
+data_sector 	dw 0
+
+read_sectors	db 1
+read_sector		db 0
+read_cylinder	db 0
+read_head		db 0
+read_drive		db 0
+
+;###########################################################
+
+load_sectors:
 	
-	mov 	bx, 0x0A00
+	lba_chs:	; ax = «·⁄‰Ê«‰ «· ”·”·Ì ··Õ“„… (LBA)
+		
+		xor 	dx, dx
+		div		word [sectors_per_track]
+		add		dl, 1
+		
+		mov		byte [read_sector], dl
+		
+		xor 	dx, dx
+		div		word [heads_per_cylinder]
+		mov		byte [read_head], dl
+		mov		byte [read_cylinder], al
+		
 	mov 	ah, 2
-	mov 	al, 1
-	mov 	ch, 0
-	mov 	cl, 6
-	mov 	dh, 0
+	mov		al, [read_sectors]
+	mov		ch, [read_cylinder]
+	mov		cl, [read_sector]
+	mov		dh, [read_head]
+	mov		dl, [read_drive]
 	int		0x13
 	ret
 
-;###############################################################################
+;###########################################################
 
-load_os:
+load_file:
 	
-	mov 	bx, 0x0C00 ;.................................... load OS to 0x07C0:0x0A00
-	mov 	ah, 2
-	mov 	al, 10     ;.................................... load 10 sectors for os_main
-	mov 	ch, 0
-	mov 	cl, 7
-	mov 	dh, 0
-	int 	0x13
+	.load_root:
 	
-	jmp 	0x07C0:0x0C00
-	;ret
-
-;###############################################################################
+		mov		byte [read_sectors], 14 ;................... ÕÃ„ ÃœÊ· √”„«¡ «·„·›«  ÂÊ 14 ﬁÿ«⁄«
+		
+		mov 	ax, 19 ;.................................... „Êﬁ⁄ ÃœÊ· √”„«¡ «·„·›«  Ì»œ√ ⁄‰œ «·ﬁÿ«⁄ 19 ( ÕœÌœ« »⁄œ ÃœÊ·Ì  ⁄ÌÌ‰ „Ê«ﬁ⁄  Œ“Ì‰ «·„·›«  ≈÷«›… ≈·Ï «·ﬁÿ«⁄«  «·„ÕÃÊ“… Ê«·Ì ÂÌ ⁄»«—… ⁄‰ ﬁÿ«⁄ Ê«Õœ Ì „À· ›Ì ﬁÿ«⁄ «·≈ﬁ·«⁄)
+		
+		mov 	bx, 0x0200 ;................................  Õ„Ì· ÃœÊ· √”„«¡ «·„·›«  ≈·Ï „Êﬁ⁄ «·–«ﬂ—… [0x07C0:0x0200]
+		call 	load_sectors
+		
+	.search_file:
+		
+		mov 	cx, [root_entries]
+		mov		di, 0x0200 ;................................ »œ«Ì… «·»ÕÀ ⁄‰ «·„·› ⁄‰œ „Êﬁ⁄ «·–«ﬂ—… [0x07C0:0x0200]
+		
+		.loop:
+			push 	cx ;.................................... cx = ⁄œœ «·„·›«  «· Ì Ì„ﬂ‰  Œ“Ì‰Â« ⁄·Ï «·ﬁ—’
+			push	di ;.................................... di = „Êﬁ⁄ ÃœÊ· √”„«¡ «·„·›«  ⁄·Ï «·–«ﬂ—… «·ÕÌ… [0x7C0:0x0200]
+			mov		cx, 11 ;................................ ⁄œœ «·Õ—Ê› ›Ì «”„ «·„·› ÂÊ 11 Õ—›«
+			
+			mov 	si, file_name
+			rep		cmpsb
+			pop		di
+			je		.load_FAT
+			
+			add		di, 32
+			pop		cx
+			loop	.loop
+			
+	
+	.load_FAT:
+		
+		xor 	dx, dx
+		add		dx, word [di + 26]
+		mov		word [file_cluster], dx
+		
+		mov		byte [read_sectors], 18
+		
+		mov 	ax, word [reserved_sectors]
+		
+		mov 	bx, 0x0200
+		call 	load_sectors
+		
+	mov 	ax, 0x0050
+	mov 	es, ax
+	mov		bx, 0x0000
+	push 	bx
+		
+	.load:
+	
+		mov 	ax, word [file_cluster]
+		
+		.cluster_lba:
+			
+			sub 	ax, 2
+			;mul		word [bpbSectorsPerCluster]
+			add		ax, 33 ;................................ »Ì«‰«  «·„·›«   Õ›Ÿ »œ«Ì… „‰ «·ﬁÿ«⁄ 33
+		
+		mov		cx, word [sectors_per_cluster]
+		mov		byte [read_sectors], cl
+		
+		call 	load_sectors ;.............................. ﬁ—«¡… Õ“„… »Ì«‰«  Ê«Õœ… (›Ì Õ«· ‰« ÂÌ ⁄»«—… ⁄‰ ﬁÿ«⁄ Ê«Õœ)
+		
+		
+		.cluster_FAT_offset:
+		
+			mov 	ax, word [file_cluster]
+			mov		dx, ax
+			mov		cx, ax
+			shr		dx, 0x0001				;............... «·≈“«Õ… ≈·Ï «·Ì„Ì‰ »ŒÿÊ… Ê«Õœ…  ﬂ«›∆ ﬁ”„… «·—ﬁ„ «·„“«Õ ⁄·Ï «·—ﬁ„ 2
+			add		cx, dx					;............... cx = —ﬁ„ «·Õ“„… ◊ 3/2
+			
+			mov 	bx, 0x0200
+			add		bx, cx					;............... bx = —ﬁ„ «·Õ“„… ›Ì ÃœÊ·  ⁄ÌÌ‰ „Ê«ﬁ⁄  Œ“Ì‰ «·„·›«  (⁄·Ï «·–«ﬂ—…)
+			
+			mov		dx, word [bx]
+			test	ax, 0x0001
+			jnz		.odd_cluster
+			
+			.even_cluster:
+				
+				and 	dx, 0000111111111111b
+				jmp 	.done
+				
+			.odd_cluster:
+		
+				shr 	dx, 0x0004
+				
+			.done:
+			
+				pop bx
+				add bx, 512
+				push bx
+				
+				mov		word [file_cluster], dx
+				
+				cmp		dx, 0x0FF0
+				jb		.load
+				
+			.return:
+				
+				mov dl, byte [read_drive]
+				
+				jmp 0x0050:0x0000
+				
+	ret
+	
+;###########################################################
 
 main:
 	
 	mov 	ax, 0x07C0
-	mov 	ds, ax
+	mov		ds, ax
 	mov 	es, ax
 	
-	call 	load_font
-	call 	load_logo
-	call 	load_os
+	mov		byte [read_drive], dl
 	
-;###############################################################################
+	call 	load_file
+	
+	cli
+	hlt
 
-times 510 - ($ - $$) db 0
+times 510 - ($-$$) db 0
 dw 0xAA55
 
-incbin "src/resources/font.bin"
-incbin "src/resources/logo.bin"
-incbin "os_main.bin"
+; ≈‰‘«¡ ’Ê—… ··ﬁ—’ «·„—‰
 
-times (512 * 18 * 80 * 2) - ($ - $$) db 0
+times (  512   *   18    *   80   *   2  ) - ($-$$) db 0 ; 1474560 À„«‰Ì

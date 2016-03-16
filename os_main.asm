@@ -1,6 +1,8 @@
 jmp os_main
 
+%include "src/fat12.asm"
 %include "src/string.asm"
+%include "print.asm"
 %include "src/image.asm"
 %include "src/commands.asm"
 %include "src/keyboard.asm"
@@ -9,15 +11,16 @@ VIDEO_SEGMENT 				dw 0xA000
 SCREEN_WIDTH 				dw 320
 SCREEN_HEIGHT 				dw 200
 
-FONT_SEGMENT 				dw 0x07E0
-DEFAULT_FOREGROUND_COLOR 	db 7 ;.......................... white
-DEFAULT_BACKGROUND_COLOR 	db 0 ;.......................... black
+FONT_SEGMENT 				dw 0x0790 ;..................... 0x0050:0x7400
+LOGO_SEGMENT 				dw 0x0810 ;..................... 0x0050:0x7C00
+DEFAULT_FOREGROUND_COLOR 	db 7 ;.......................... √»Ì÷
+DEFAULT_BACKGROUND_COLOR 	db 0 ;.......................... √”Êœ
 
 TOP_MARGIN 					db 3
 RIGHT_MARGIN 				db 1
 TOP_PANEL_HEIGHT 			db 14
 
-command_buffer 				times 100 db 0
+command_buffer 				times 100 db 0 ;................ ”·”·… «·Õ—Ê› «·Œ«’… »«”„ «·√„— (100 Õ—› ﬂÕœ √ﬁ’Ï)
 buffer_index 				db 0
 
 
@@ -86,7 +89,7 @@ draw_starting_mark:
 	xor 	ax, ax
 	mov 	al, byte [RIGHT_MARGIN]
 	add 	al, byte[LAST_CHAR_WIDTH]
-	add 	al, 2;.......................................... space between starting mark (gt sign) and user input command
+	add 	al, 2;.......................................... «·›—«€ »Ì‰ ⁄·«„… «·»œ«Ì… Ê«·‰’ «·–Ì Ìﬂ »Â «·„” Œœ„
 	mov 	word [CHAR_X], ax
 	
 	ret
@@ -95,7 +98,7 @@ draw_starting_mark:
 
 draw_top_panel:
 	
-	mov 	ax, 0x0860 ;.................................... logo is loded at 0x07C0:0x0A00 ie 0x8600
+	mov 	ax, word[LOGO_SEGMENT]
 	mov 	gs, ax
 	xor 	si, si
 	
@@ -113,10 +116,10 @@ draw_top_panel:
 	
 	call 	draw_image
 	
-	;draw bottom line
+	;«·Œÿ «·–Ì Ì„À· «·ÕœÊœ «·”›·Ì… ··‘—Ìÿ «·⁄·ÊÌ
 	mov 	bx, 319
 	xor 	cx, cx
-	mov 	cl, byte[TOP_PANEL_HEIGHT] ;........................................ y
+	mov 	cl, byte[TOP_PANEL_HEIGHT]
 	
 	mov 	ax, 320
 	mul 	cx
@@ -135,8 +138,8 @@ draw_top_panel:
 		
 	.draw_end:
 		
-	;write logo
-	mov 	word [CHAR_X], 20 ;............................. right margin + image width + space (2px)= 20
+	;ﬂ «»… «·‘⁄«— («”„ «·‰Ÿ«„)
+	mov 	word [CHAR_X], 20 ;............................. «·Â«„‘ «·√Ì„‰ + ⁄—÷ «·’Ê—… (2 ‰ﬁÿ…) = 20 ‰ﬁÿ…
 	xor 	ax, ax
 	mov 	al, byte [TOP_MARGIN]
 	mov 	word [CHAR_Y], ax
@@ -150,13 +153,33 @@ draw_top_panel:
 		
 os_main:
 	
-	mov 	ax, 0x0880 ;.................................... os is loded at 0x07C00:0x0C00 ie 0x8800
+	mov 	ax, 0x0050
 	mov 	ds, ax
-	mov 	es, ax
 	
 	xor 	ax, ax
 	
 	call 	switch_mode_13h
+	
+	call load_root_dir
+	
+	call load_FAT
+	
+	mov si, font_file_name
+	call set_file_name
+	
+	mov ax, word[FONT_SEGMENT]
+	mov word[file_load_segment], ax
+	
+	call load_file
+	
+	mov si, logo_file_name
+	call set_file_name
+	
+	mov ax, word[LOGO_SEGMENT]
+	mov word[file_load_segment], ax
+	
+	call load_file
+	
 	call 	draw_top_panel
 	call 	reset_cursor
 	
@@ -169,5 +192,7 @@ os_main:
 	hlt
 
 ;###########################################################
-	
+
+logo_file_name db "LOGO    BIN", 0
+font_file_name db "FONT    BIN", 0
 str_alfanak db 20, 107, 92, 116, 102, 0

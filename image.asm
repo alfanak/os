@@ -15,17 +15,17 @@ draw_image:
 	mov 	bx, word [IMAGE_X]
 	push 	bx
 	
-	mov 	ax, word [gs:si] ;.............................. ax = image width
+	mov 	ax, word [gs:si] ;.............................. ⁄—÷ «·’Ê—…
 	mov 	word[IMAGE_LEFT_END], bx
-	sub 	word[IMAGE_LEFT_END], ax ;...................... image left end = image width + image x
+	sub 	word[IMAGE_LEFT_END], ax ;...................... «·ÕœÊœ «·Ì”—Ï ··’Ê—… = ⁄—÷ «·’Ê—… + «·„Êﬁ⁄ «·√›ﬁÌ ··’Ê—… (”)
 	
 	mov 	cx, word [IMAGE_Y]
 	
-	mov 	ax, word [gs:si + 2] ;.......................... ax = image height
+	mov 	ax, word [gs:si + 2] ;.......................... «— ›«⁄ «·’Ê—…
 	mov 	word [IMAGE_BOTTOM_END], cx
-	add 	word [IMAGE_BOTTOM_END], ax ;................... image bottom end = image height + image y
+	add 	word [IMAGE_BOTTOM_END], ax ;................... «·ÕœÊœ «·”›·Ì… ··’Ê—… = «— ›«⁄ «·’Ê—… + «·„Êﬁ⁄ «·⁄„ÊœÌ ··’Ê—… (⁄)
 	
-	add 	si, 4 ;......................................... si point to image data (after image width & image height)
+	add 	si, 4 ;......................................... »Ì«‰«  «·’Ê—…  »œ√ »⁄œ «·⁄—÷ Ê«·«— ›«⁄(ﬂ· „‰Â« Ì„À· À„«‰Ì „÷«⁄›)
 	
 	mov 	ax, 320
 	mul 	cx
@@ -34,39 +34,37 @@ draw_image:
 	
 	.draw_pixels_loop:
 		
-		mov 	dl, byte [gs:si] ;.......................... al = next pixel
-		cmp 	dl, 0 ;..................................... 0 means transparent pixel (either we dont draw it or we use DEFAULT_BACKGROUND_COLOR for it)
-		je 		.ignore ;................................... transparent pixel? dont draw it
-		;................................................... else
-		dec 	dl ;........................................ color = [al] - 1
+		mov 	dl, byte [gs:si] ;.......................... «·‰ﬁÿ… «· «·Ì… (ﬂ· ‰ﬁÿ…  „À· ⁄‰ ÿ—Ìﬁ À„«‰Ì Ê«Õœ)
+		cmp 	dl, 0 ;..................................... «·ﬁÌ„… 0  ⁄‰Ì √‰ Â–Â ‰ﬁÿ… ‘›«›…° »≈„ﬂ«‰‰« ≈„«  Ã«Â·Â« Ê⁄œ„ —”„Â« √Ê —”„Â« »«” ⁄„«· ·Ê‰ «·Œ·›Ì…
+		je 		.ignore
+		dec 	dl ;........................................ «··Ê‰ = ﬁÌ„… «··Ê‰ „‰ »Ì«‰«  «·’Ê—… - 1
 		
-		mov 	di, ax ;.................................... di = SCREEN_WIDTH (320) x IMAGE_Y
-		add 	di, bx ;.................................... di = SCREEN_WIDTH (320) x IMAGE_Y + IMAGE_X
+		mov 	di, ax
+		add 	di, bx ;.................................... „Ê÷⁄ —”„ «·‰ﬁÿ… «·Õ«·Ì… = ⁄—÷ «·‘«‘…(320 ‰ﬁÿ…) ◊ «·„Êﬁ⁄ «·⁄„ÊœÌ ··’Ê—… + «·„Êﬁ⁄ «·√›ﬁÌ ··’Ê—…
 		
-		mov 	byte [es:di], dl ;.......................... 0xA000:DI = pixel color
+		mov 	byte [es:di], dl ;.......................... ‰÷⁄ «··Ê‰ ›Ì «·„ﬂ«‰ «·„‰«”» ⁄·Ï „Ê÷⁄ «·–«ﬂ—… «·„Œ’’ ··‘«‘⁄… [0xA000:DI]
 		
 		.ignore:
 		
-		inc 	si ;........................................ select next pixel
-		dec 	bx ;........................................
-		cmp 	bx, word[IMAGE_LEFT_END] ;.................. we reached the end of pixels line? (image width)
-		je 		.next_pixels_row ;.......................... YES? go next pixels line
-				;........................................... else
-		jmp 	.draw_pixels_loop ;......................... continue drawing pixels 
+		inc 	si ;........................................ «·‰ﬁÿ… «· «·Ì…
+		dec 	bx
+		cmp 	bx, word[IMAGE_LEFT_END] ;.................. Â· Ê’·‰« ≈·Ï ‰Â«Ì… ”ÿ— «·‰ﬁ«ÿ «·Œ«’… »«·’Ê—…ø («·–Ì ÂÊ ‰›”Â ⁄—÷ «·’Ê—…)
+		je 		.next_pixels_row ;.......................... ‰⁄„ø «‰ ﬁ· ·—”„ ”ÿ— «·‰ﬁ«ÿ «· «·Ì
+		jmp 	.draw_pixels_loop ;......................... ·«ø √ﬂ„· —”„ »ﬁÌ… ‰ﬁ«ÿ «·”ÿ—
 		
 	.next_pixels_row:
 		
-		pop 	bx ;........................................ bx = image width
-		inc 	cx ;........................................ select next pixels line
-		cmp 	cx, word[IMAGE_BOTTOM_END] ;................ we reached the last line?
-		je 		.return ;................................... YES? stop drawing (return)
-				;........................................... else
-		push 	bx ;........................................ save image width
+		pop 	bx ;........................................ ⁄—÷ «·’Ê—…
+		inc 	cx ;........................................ «·”ÿ— «· «·Ì „‰ «·‰ﬁ«ÿ
+		cmp 	cx, word[IMAGE_BOTTOM_END] ;................ Â· ﬂ«‰ Â–« √Œ— ”ÿ— „‰ «·‰ﬁ«ÿ ›Ì «·’Ê—…ø
+		je 		.return ;................................... ‰⁄„ø ≈‰Â«¡ «·—”„
+		
+		push 	bx ;........................................ Õ›Ÿ ⁄—÷ «·’Ê—… ·—”„ »ﬁÌ… «·√”ÿ—
 		
 		mov 	ax, 320
 		mul 	cx
 		
-		jmp 	.draw_pixels_loop ;......................... continue drawing pixels
+		jmp 	.draw_pixels_loop ;......................... «·⁄Êœ… ·—”„ »ﬁÌ… ‰ﬁ«ÿ «·’Ê—…
 		
 	.return:
 	
