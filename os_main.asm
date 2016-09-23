@@ -13,14 +13,14 @@ SCREEN_HEIGHT 				dw 200
 
 FONT_SEGMENT 				dw 0x0790 ;..................... 0x0050:0x7400
 LOGO_SEGMENT 				dw 0x0810 ;..................... 0x0050:0x7C00
-DEFAULT_FOREGROUND_COLOR 	db 7 ;.......................... รศํึ
-DEFAULT_BACKGROUND_COLOR 	db 0 ;.......................... รำๆฯ
+DEFAULT_FOREGROUND_COLOR 	db 7 ;.......................... ุฃุจูุถ
+DEFAULT_BACKGROUND_COLOR 	db 0 ;.......................... ุฃุณูุฏ
 
 TOP_MARGIN 					db 3
 RIGHT_MARGIN 				db 1
 TOP_PANEL_HEIGHT 			db 14
 
-command_buffer 				times 100 db 0 ;................ ำแำแษ วแอัๆÝ วแฮวีษ ศวำใ วแรใั (100 อัÝ ฿อฯ รÞี์)
+command_buffer 				times 100 db 0 ;................ ุณูุณูุฉ ุงูุญุฑูู ุงูุฎุงุตุฉ ุจุงุณู… ุงูุฃู…ุฑ (100 ุญุฑู ูุญุฏ ุฃูุตู)
 buffer_index 				db 0
 
 
@@ -89,7 +89,7 @@ draw_starting_mark:
 	xor 	ax, ax
 	mov 	al, byte [RIGHT_MARGIN]
 	add 	al, byte[LAST_CHAR_WIDTH]
-	add 	al, 2;.......................................... วแÝัวÛ ศํไ ฺแวใษ วแศฯวํษ ๆวแไี วแะํ ํ฿สศๅ วแใำสฮฯใ
+	add 	al, 2;.......................................... ุงููุฑุงุบ ุจูู ุนูุงู…ุฉ ุงูุจุฏุงูุฉ ูุงููุต ุงูุฐู ููุชุจู ุงูู…ุณุชุฎุฏู…
 	mov 	word [CHAR_X], ax
 	
 	ret
@@ -116,7 +116,7 @@ draw_top_panel:
 	
 	call 	draw_image
 	
-	;วแฮุ วแะํ ํใหแ วแอฯๆฯ วแำÝแํษ แแิัํุ วแฺแๆํ
+	;ุงูุฎุท ุงูุฐู ูู…ุซู ุงูุญุฏูุฏ ุงูุณูููุฉ ููุดุฑูุท ุงูุนููู
 	mov 	bx, 319
 	xor 	cx, cx
 	mov 	cl, byte[TOP_PANEL_HEIGHT]
@@ -138,8 +138,8 @@ draw_top_panel:
 		
 	.draw_end:
 		
-	;฿สวศษ วแิฺวั (วำใ วแไูวใ)
-	mov 	word [CHAR_X], 20 ;............................. วแๅวใิ วแรํใไ + ฺัึ วแีๆัษ (2 ไÞุษ) = 20 ไÞุษ
+	;ูุชุงุจุฉ ุงูุดุนุงุฑ (ุงุณู… ุงููุธุงู…)
+	mov 	word [CHAR_X], 20 ;............................. ุงููุงู…ุด ุงูุฃูู…ู + ุนุฑุถ ุงูุตูุฑุฉ (2 ููุทุฉ) = 20 ููุทุฉ
 	xor 	ax, ax
 	mov 	al, byte [TOP_MARGIN]
 	mov 	word [CHAR_Y], ax
@@ -196,3 +196,4 @@ os_main:
 logo_file_name db "LOGO    BIN", 0
 font_file_name db "FONT    BIN", 0
 str_alfanak db 20, 107, 92, 116, 102, 0
+
