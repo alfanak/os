@@ -28,7 +28,7 @@ cmd_version:
 	
 	mov 	si, str_alfanak_os
 	call 	print_string
-	add 	word [CHAR_X], 5 ; İÑÇÛ
+	add 	word [CHAR_X], 5 ; ÙØ±Ø§Øº
 	mov 	si, str_version_number
 	call 	print_string
 	
@@ -101,7 +101,7 @@ cmd_clean_screen:
 	xor 	dx, dx
 	mov 	dl, byte[LINE_HEIGHT]
 	mov 	al, byte[CURRENT_LINE]
-	inc 	al ; ÅÖÇİÉ ÇáÓØÑ ÇáÍÇáí
+	inc 	al ; Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ø³Ø·Ø± Ø§Ù„Ø­Ø§Ù„ÙŠ
 	mul 	dl
 	xor 	dx, dx
 	mov 	dl, byte [TOP_PANEL_HEIGHT]
@@ -166,18 +166,19 @@ show_error_message:
 
 ;###########################################################
 
-command_name_help 			db 111, 64, 21, 87, 54, 121, 0 ; ãÓÇÚÏÉ
-command_name_help_2 		db 139, 0 ; ÚáÇãÉ ÇÓÊİåÇã
-command_name_version 		db 24, 71, 54, 20, 57, 0 ; ÅÕÏÇÑ
-command_name_version_2 		db 20, 71, 54, 20, 57, 0 ; ÇÕÏÇÑ
-command_name_reboot 		db 24, 87, 21, 53, 121, 138, 20, 107, 36, 68, 92, 130, 106, 0 ; ÅÚÇÏÉ ÇáÊÔÛíá
-command_name_poweroff 		db 22, 79, 96, 134, 0 ; ÃØİÆ
-command_name_poweroff_2		db 20, 79, 96, 134, 0 ; ÇØİÆ
-command_name_clean			db 111, 64, 46, 0 ; ãÓÍ
-command_name_cleanscreen	db 111, 64, 46, 138, 20, 107, 68, 21, 67, 122,0 ; ãÓÍ ÇáÔÇÔÉ
-command_name_cleanscreen_2	db 111, 64, 46, 138, 20, 107, 68, 21, 67, 118,0 ; ãÓÍ ÇáÔÇÔå
+command_name_help 			db 111, 64, 21, 87, 54, 121, 0 ; Ù…Ø³Ø§Ø¹Ø¯Ø©
+command_name_help_2 		db 139, 0 ; Ø¹Ù„Ø§Ù…Ø© Ø§Ø³ØªÙÙ‡Ø§Ù…
+command_name_version 		db 24, 71, 54, 20, 57, 0 ; Ø¥ØµØ¯Ø§Ø±
+command_name_version_2 		db 20, 71, 54, 20, 57, 0 ; Ø§ØµØ¯Ø§Ø±
+command_name_reboot 		db 24, 87, 21, 53, 121, 138, 20, 107, 36, 68, 92, 130, 106, 0 ; Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„ØªØ´ØºÙŠÙ„
+command_name_poweroff 		db 22, 79, 96, 134, 0 ; Ø£Ø·ÙØ¦
+command_name_poweroff_2		db 20, 79, 96, 134, 0 ; Ø§Ø·ÙØ¦
+command_name_clean			db 111, 64, 46, 0 ; Ù…Ø³Ø­
+command_name_cleanscreen	db 111, 64, 46, 138, 20, 107, 68, 21, 67, 122,0 ; Ù…Ø³Ø­ Ø§Ù„Ø´Ø§Ø´Ø©
+command_name_cleanscreen_2	db 111, 64, 46, 138, 20, 107, 68, 21, 67, 118,0 ; Ù…Ø³Ø­ Ø§Ù„Ø´Ø§Ø´Ù‡
 
-str_alfanak_os 				db 115, 84, 21, 109, 138, 35, 68, 92, 130, 106, 138, 20, 107, 92, 116, 102, 0 ; äÙÇã ÊÔÛíá Çáİäß
-str_version_number 			db 11, 10, 10, 152, 10, 0 ; ÑŞã ÇáÅÕÏÇÑ (ãßÊæÈ ãä Çáíãíä Åáì ÇáíÓÇÑ)
-str_help_message 			db 22, 119, 108, 21, 138, 123, 63, 120, 108, 21, 138, 31, 102, 138, 95, 128, 138, 0 ; ÃåáÇ æÓåáÇ Èßã İí
-str_command_unknown 		db 79, 108, 30, 138, 91, 130, 58, 138, 111, 88, 58, 123, 93, 0 ; ØáÈ ÛíÑ ãÚÑæİ
+str_alfanak_os 				db 115, 84, 21, 109, 138, 35, 68, 92, 130, 106, 138, 20, 107, 92, 116, 102, 0 ; Ù†Ø¸Ø§Ù… ØªØ´ØºÙŠÙ„ Ø§Ù„ÙÙ†Ùƒ
+str_version_number 			db 11, 10, 10, 152, 10, 0 ; Ø±Ù‚Ù… Ø§Ù„Ø¥ØµØ¯Ø§Ø± (Ù…ÙƒØªÙˆØ¨ Ù…Ù† Ø§Ù„ÙŠÙ…ÙŠÙ† Ø¥Ù„Ù‰ Ø§Ù„ÙŠØ³Ø§Ø±)
+str_help_message 			db 22, 119, 108, 21, 138, 123, 63, 120, 108, 21, 138, 31, 102, 138, 95, 128, 138, 0 ; Ø£Ù‡Ù„Ø§ ÙˆØ³Ù‡Ù„Ø§ Ø¨ÙƒÙ… ÙÙŠ
+str_command_unknown 		db 79, 108, 30, 138, 91, 130, 58, 138, 111, 88, 58, 123, 93, 0 ; Ø·Ù„Ø¨ ØºÙŠØ± Ù…Ø¹Ø±ÙˆÙ
+
